@@ -3,7 +3,6 @@ package edu.mailman.happyplaces
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import edu.mailman.happyplaces.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

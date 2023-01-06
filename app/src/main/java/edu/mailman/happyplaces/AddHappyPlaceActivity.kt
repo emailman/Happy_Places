@@ -18,8 +18,6 @@ class AddHappyPlaceActivity : AppCompatActivity() {
         binding?.toolbarAddPlace?.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-
-
     }
 
     override fun onDestroy() {
