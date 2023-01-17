@@ -1,4 +1,4 @@
-package edu.mailman.happyplaces
+package edu.mailman.happyplaces.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
