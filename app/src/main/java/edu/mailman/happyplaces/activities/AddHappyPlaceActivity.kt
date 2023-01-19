@@ -22,7 +22,9 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import edu.mailman.happyplaces.R
+import edu.mailman.happyplaces.database.DatabaseHandler
 import edu.mailman.happyplaces.databinding.ActivityAddHappyPlaceBinding
+import edu.mailman.happyplaces.models.HappyPlaceModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -57,6 +59,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             updateDateInView()
         }
+        updateDateInView()
 
         binding?.etDate?.setOnClickListener(this)
         binding?.tvAddImage?.setOnClickListener(this)
@@ -91,7 +94,47 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 pictureDialog.show()
             }
             R.id.btn_save -> {
-
+                when {
+                    binding?.etTitle?.text.isNullOrEmpty() -> {
+                        Toast.makeText(this,
+                            "Please enter title", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    binding?.etDescription?.text.isNullOrEmpty() -> {
+                        Toast.makeText(this,
+                            "Please enter description", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    binding?.etLocation?.text.isNullOrEmpty() -> {
+                        Toast.makeText(this,
+                            "Please enter location", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    saveImageToInternalStorage == null -> {
+                        Toast.makeText(this,
+                            "Please select image", Toast.LENGTH_SHORT
+                        ).show()
+                    } else -> {
+                        val happyPlaceModel = HappyPlaceModel(
+                            0,
+                            binding?.etTitle?.text.toString(),
+                            saveImageToInternalStorage.toString(),
+                            binding?.etDescription?.text.toString(),
+                            binding?.etDate?.text.toString(),
+                            binding?.etLocation?.text.toString(),
+                            latitude,
+                            longitude
+                        )
+                        val dbHandler = DatabaseHandler(this)
+                        val addHappyPlace = dbHandler.addHappyPlace(happyPlaceModel)
+                        if (addHappyPlace > 0) {
+                            Toast.makeText(this,
+                                "Details inserted successfully", Toast.LENGTH_SHORT
+                            ).show()
+                            finish()
+                        }
+                    }
+                }
             }
         }
     }
