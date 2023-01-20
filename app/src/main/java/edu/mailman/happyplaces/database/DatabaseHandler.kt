@@ -1,8 +1,10 @@
 package edu.mailman.happyplaces.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import edu.mailman.happyplaces.models.HappyPlaceModel
@@ -26,7 +28,7 @@ class DatabaseHandler(context: Context) :
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        val CREATE_HAPPY_PLACE_TABLE = ("CREATE TABLE " + TABLE_HAPPY_PLACE + "("
+        val createHappyPlaceTable = ("CREATE TABLE " + TABLE_HAPPY_PLACE + "("
                 + KEY_ID + " INTEGER PRIMARY KEY,"
                 + KEY_TITLE + " TEXT,"
                 + KEY_IMAGE + " TEXT,"
@@ -35,8 +37,8 @@ class DatabaseHandler(context: Context) :
                 + KEY_LOCATION + " TEXT,"
                 + KEY_LATITUDE + " TEXT,"
                 + KEY_LONGITUDE + " TEXT)")
-        Log.i("HappyPlace", CREATE_HAPPY_PLACE_TABLE)
-        db?.execSQL(CREATE_HAPPY_PLACE_TABLE)
+        Log.i("HappyPlace", createHappyPlaceTable)
+        db?.execSQL(createHappyPlaceTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -60,5 +62,38 @@ class DatabaseHandler(context: Context) :
 
         db.close()
         return result
+    }
+
+    @SuppressLint("Range")
+    fun getHappyPlacesList() : ArrayList<HappyPlaceModel> {
+        val happyPlaceList = ArrayList<HappyPlaceModel>()
+        val selectQuery = "SELECT * FROM $TABLE_HAPPY_PLACE"
+        val db = this.readableDatabase
+
+        try {
+            val cursor = db.rawQuery(selectQuery, null)
+            if (cursor.moveToFirst()) {
+                do {
+                    val place = HappyPlaceModel(
+                        cursor.getInt(cursor.getColumnIndex(KEY_ID)),
+                        cursor.getString(cursor.getColumnIndex(KEY_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(KEY_IMAGE)),
+                        cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)),
+                        cursor.getString(cursor.getColumnIndex(KEY_DATE)),
+                        cursor.getString(cursor.getColumnIndex(KEY_LOCATION)),
+                        cursor.getDouble(cursor.getColumnIndex(KEY_LATITUDE)),
+                        cursor.getDouble(cursor.getColumnIndex(KEY_LONGITUDE))
+                    )
+                    happyPlaceList.add(place)
+
+                } while (cursor.moveToNext())
+            }
+            cursor.close()
+
+        } catch (e: SQLiteException) {
+            db.execSQL(selectQuery)
+            return ArrayList()
+        }
+        return happyPlaceList
     }
 }
