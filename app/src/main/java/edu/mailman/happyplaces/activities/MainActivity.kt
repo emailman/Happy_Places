@@ -1,8 +1,10 @@
 package edu.mailman.happyplaces.activities
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.mailman.happyplaces.adapters.HappyPlacesAdapter
@@ -22,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         binding?.fabAddHappyPlace?.setOnClickListener {
             val intent =
                 Intent(this@MainActivity, AddHappyPlaceActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, ADD_PLACE_ACTIVITY_REQUEST_CODE)
         }
         getHappyPlacesListFromLocalDB()
     }
@@ -48,8 +50,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ADD_PLACE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                getHappyPlacesListFromLocalDB()
+            } else {
+                Log.i("HappyPlaces", "User cancelled or back pressed")
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         binding = null
+    }
+
+    companion object {
+        var ADD_PLACE_ACTIVITY_REQUEST_CODE = 1
     }
 }

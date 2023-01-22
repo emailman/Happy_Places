@@ -8,19 +8,28 @@
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.HappyPlaces"
-        android:enableOnBackInvokedCallback="true"
         tools:targetApi="31">
         <activity
-            android:name=".activities.AddHappyPlaceActivity"
+            android:name=".activities.HappyPlaceDetailActivity"
+            android:label="Happy Place Details"
             android:screenOrientation="portrait"
-            android:label="ADD HAPPY PLACE"
-            android:theme="@style/CustomNoActionBarTheme"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.AddHappyPlaceActivity"
             android:exported="false"
+            android:label="ADD HAPPY PLACE"
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomNoActionBarTheme"
             tools:ignore="LockedOrientationActivity">
             <meta-data
                 android:name="android.app.lib_name"
@@ -40,5 +49,4 @@
                 android:value="" />
         </activity>
     </application>
-
 </manifest>
