@@ -1,6 +1,8 @@
 package edu.mailman.happyplaces.models
 
-data class HappyPlaceModel (
+import java.io.Serializable
+
+data class HappyPlaceModel(
     val id: Int,
     val title: String,
     val image: String,
@@ -9,4 +11,4 @@ data class HappyPlaceModel (
     val location: String,
     val latitude: Double,
     val longitude: Double
-    )
+) : Serializable

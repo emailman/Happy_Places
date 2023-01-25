@@ -1,12 +1,46 @@
 package edu.mailman.happyplaces.activities
 
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import edu.mailman.happyplaces.R
+import edu.mailman.happyplaces.databinding.ActivityHappyPlaceDetailBinding
+import edu.mailman.happyplaces.models.HappyPlaceModel
 
 class HappyPlaceDetailActivity : AppCompatActivity() {
+    private var binding: ActivityHappyPlaceDetailBinding? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_happy_place_detail)
+        binding = ActivityHappyPlaceDetailBinding.inflate(layoutInflater)
+        setContentView(binding?.root)
+
+
+        var happyPlaceModel: HappyPlaceModel? = null
+
+        if (intent.hasExtra(MainActivity.EXTRA_PLACE_DETAILS)) {
+            happyPlaceModel =
+                intent.getSerializableExtra(MainActivity.EXTRA_PLACE_DETAILS)
+                        as HappyPlaceModel
+        }
+
+        if (happyPlaceModel != null) {
+            setSupportActionBar(binding?.toolbarHappyPlaceDetail)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.title = happyPlaceModel.title
+
+            binding?.toolbarHappyPlaceDetail?.setNavigationOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+
+            binding?.ivPlaceImage?.setImageURI(Uri.parse(happyPlaceModel.image))
+            binding?.tvDescription?.text = happyPlaceModel.description
+            binding?.tvLocation?.text = happyPlaceModel.location
+        }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
+    }
+
 }
