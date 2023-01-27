@@ -12,7 +12,8 @@ import edu.mailman.happyplaces.R
 /**
  * A abstract class which we will use for edit feature.
  */
-abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+abstract class SwipeToEditCallback(context: Context) :
+    ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
 
     private val editIcon = ContextCompat.getDrawable(context, R.drawable.ic_edit_white_24dp)
     private val intrinsicWidth = editIcon!!.intrinsicWidth
@@ -54,7 +55,8 @@ abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCal
 
         // Draw the green edit background
         background.color = backgroundColor
-        background.setBounds(itemView.left + dX.toInt(), itemView.top, itemView.left, itemView.bottom)
+        background.setBounds(itemView.left + dX.toInt(),
+            itemView.top, itemView.left, itemView.bottom)
         background.draw(c)
 
         // Calculate position of edit icon
@@ -64,7 +66,7 @@ abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCal
         val editIconRight = itemView.left + editIconMargin
         val editIconBottom = editIconTop + intrinsicHeight
 
-        // Draw the delete icon
+        // Draw the edit icon
         editIcon!!.setBounds(editIconLeft, editIconTop, editIconRight, editIconBottom)
         editIcon.draw(c)
 
