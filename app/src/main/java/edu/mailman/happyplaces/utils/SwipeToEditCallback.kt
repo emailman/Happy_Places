@@ -8,10 +8,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import edu.mailman.happyplaces.R
 
-// TODO (Step 1 : Creating a utils package and a class for feature to edit the place details in it.)
-// START
-// For detail explanation of this class you can look at below link.
-// https://medium.com/@kitek/recyclerview-swipe-to-delete-easier-than-you-thought-cff67ff5e5f6
+
 /**
  * A abstract class which we will use for edit feature.
  */
@@ -78,4 +75,3 @@ abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCal
         c?.drawRect(left, top, right, bottom, clearPaint)
     }
 }
-// END

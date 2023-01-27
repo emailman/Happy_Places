@@ -99,6 +99,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                     cal.get(Calendar.DAY_OF_MONTH)
                 ).show()
             }
+
             R.id.tv_add_image -> {
                 Log.i("HappyPlaces", "image clicked")
                 val pictureDialog = AlertDialog.Builder(this)
@@ -116,6 +117,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 pictureDialog.show()
             }
+
             R.id.btn_save -> {
                 when {
                     binding?.etTitle?.text.isNullOrEmpty() -> {
@@ -139,7 +141,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                         ).show()
                     } else -> {
                         val happyPlaceModel = HappyPlaceModel(
-                            0,
+                            if (happyPlaceDetails == null) 0 else happyPlaceDetails!!.id,
                             binding?.etTitle?.text.toString(),
                             saveImageToInternalStorage.toString(),
                             binding?.etDescription?.text.toString(),
@@ -149,10 +151,18 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                             longitude
                         )
                         val dbHandler = DatabaseHandler(this)
-                        val addHappyPlace = dbHandler.addHappyPlace(happyPlaceModel)
-                        if (addHappyPlace > 0) {
-                            setResult(Activity.RESULT_OK)
-                            finish()
+                        if (happyPlaceDetails == null) {
+                            val addHappyPlace = dbHandler.addHappyPlace(happyPlaceModel)
+                            if (addHappyPlace > 0) {
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
+                        } else {
+                            val updateHappyPlace = dbHandler.updateHappyPlace(happyPlaceModel)
+                            if (updateHappyPlace > 0) {
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
                         }
                     }
                 }
