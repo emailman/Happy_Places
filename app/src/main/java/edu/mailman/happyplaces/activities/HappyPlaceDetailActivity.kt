@@ -1,5 +1,6 @@
 package edu.mailman.happyplaces.activities
 
+import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -35,6 +36,11 @@ class HappyPlaceDetailActivity : AppCompatActivity() {
             binding?.ivPlaceImage?.setImageURI(Uri.parse(happyPlaceModel.image))
             binding?.tvDescription?.text = happyPlaceModel.description
             binding?.tvLocation?.text = happyPlaceModel.location
+            binding?.btnViewOnMap?.setOnClickListener {
+                val intent = Intent(this, MapActivity::class.java)
+                intent.putExtra(MainActivity.EXTRA_PLACE_DETAILS, happyPlaceModel)
+                startActivity(intent)
+            }
         }
     }
 
