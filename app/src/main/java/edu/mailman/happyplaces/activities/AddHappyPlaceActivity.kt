@@ -21,6 +21,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -36,6 +37,8 @@ import edu.mailman.happyplaces.database.DatabaseHandler
 import edu.mailman.happyplaces.databinding.ActivityAddHappyPlaceBinding
 import edu.mailman.happyplaces.models.HappyPlaceModel
 import edu.mailman.happyplaces.utils.GetAddressFromLatLng
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -49,8 +52,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
     private var cal = Calendar.getInstance()
     private lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
     private var saveImageToInternalStorage: Uri? = null
-    private var latitude: Double = 0.0
-    private var longitude: Double = 0.0
+    private var mLatitude: Double = 0.0
+    private var mLongitude: Double = 0.0
 
     private var happyPlaceDetails: HappyPlaceModel? = null
 
@@ -95,8 +98,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             binding?.etDescription?.setText(happyPlaceDetails!!.description)
             binding?.etDate?.setText(happyPlaceDetails!!.date)
             binding?.etLocation?.setText(happyPlaceDetails!!.location)
-            latitude = happyPlaceDetails!!.latitude
-            longitude = happyPlaceDetails!!.longitude
+            mLatitude = happyPlaceDetails!!.latitude
+            mLongitude = happyPlaceDetails!!.longitude
 
             saveImageToInternalStorage = Uri.parse(happyPlaceDetails!!.image)
             binding?.ivPlaceImage?.setImageURI(saveImageToInternalStorage)
@@ -124,33 +127,45 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest.interval = 1000
         locationRequest.numUpdates = 1
-        fusedLocationClient.requestLocationUpdates(locationRequest,
-            locationCallBack, Looper.myLooper())
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            mLocationCallBack,
+            Looper.myLooper())
     }
 
-    private val locationCallBack = object: LocationCallback() {
+    private val mLocationCallBack=object:LocationCallback(){
         override fun onLocationResult(locationResult: LocationResult) {
-            // super.onLocationResult()
-            val mLastLocation: Location? = locationResult.lastLocation
-            latitude = mLastLocation!!.latitude
-            Log.i("HappyPlaces", "latitude: $latitude")
-            longitude = mLastLocation.longitude
-            Log.i("HappyPlaces", "longitude: $longitude")
-            val addressTask = GetAddressFromLatLng(this@AddHappyPlaceActivity,
-                latitude, longitude)
-            addressTask.setAddressListener(object: GetAddressFromLatLng.AddressListener {
+            val mLastLocation: Location? =locationResult.lastLocation
+            mLatitude=mLastLocation!!.latitude
+            mLongitude= mLastLocation.longitude
+
+//            Log.e("LOCATION", "onLocationResult: $mLatitude and $mLongitude")
+//            Toast.makeText(this@AddPlaceActivity, "LOCATION OBTAINED", Toast.LENGTH_SHORT).show()
+
+            //Code to translate the lat and lng values to a human understandable address text
+            val addressTask=GetAddressFromLatLng(this@AddHappyPlaceActivity,
+                lat = mLatitude,lng = mLongitude)
+
+
+            addressTask.setAddressListener(object : GetAddressFromLatLng.AddressListener {
+
                 override fun onAddressFound(address: String?) {
                     binding?.etLocation?.setText(address)
                 }
 
                 override fun onError() {
-                    Log.e("HappyPlaces", "Get address error")
+                    Log.e("HappyPlaces", "Address Error")
                 }
             })
-            addressTask.getAddress()
+
+            lifecycleScope.launch(Dispatchers.IO){
+                // CoroutineScope tied to this LifecycleOwner's Lifecycle.
+                // This scope will be cancelled when the Lifecycle is destroyed
+                // Start the task to get the address in text from the lat and lng values
+                addressTask.launchBackgroundProcessForRequest()
+            }
         }
     }
-
     override fun onClick(view: View?) {
         when (view!!.id) {
 
@@ -209,8 +224,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                             binding?.etDescription?.text.toString(),
                             binding?.etDate?.text.toString(),
                             binding?.etLocation?.text.toString(),
-                            latitude,
-                            longitude
+                            mLatitude,
+                            mLongitude
                         )
                         val dbHandler = DatabaseHandler(this)
                         if (happyPlaceDetails == null) {
@@ -309,8 +324,8 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             } else if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                 val place: Place = Autocomplete.getPlaceFromIntent(data!!)
                 binding?.etLocation?.setText(place.address)
-                latitude = place.latLng!!.latitude
-                longitude = place.latLng!!.longitude
+                mLatitude = place.latLng!!.latitude
+                mLongitude = place.latLng!!.longitude
             }
         }
     }

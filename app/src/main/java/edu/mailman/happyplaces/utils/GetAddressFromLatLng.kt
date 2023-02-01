@@ -3,50 +3,55 @@ package edu.mailman.happyplaces.utils
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
-import android.os.AsyncTask
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class GetAddressFromLatLng(context: Context,
-                           private val latitude: Double,
-                           private val longitude: Double): AsyncTask<Void, String, String> () {
+                           private val lat: Double,
+                           private val lng: Double) {
     private val geocoder = Geocoder(context, Locale.getDefault())
     private lateinit var addressListener: AddressListener
 
-    override fun doInBackground(vararg p0: Void?): String {
-        val addressList: List<Address>? =
-            geocoder.getFromLocation(latitude, longitude, 1)
-
+    private fun getAddress():String{
         try {
-            if (addressList != null && addressList.isNotEmpty()) {
-                val address = addressList[0]
-                val sb = StringBuilder()
-                for (i in 0..address.maxAddressLineIndex) {
-                    sb.append(address.getAddressLine(i)).append(" ")
+            // There may be multiple locations/places associated with the lat and lng,
+            // we take the top/most relevant address
+            val addressList:List<Address>?=geocoder.getFromLocation(lat,lng,1)
+
+            if(!addressList.isNullOrEmpty()){
+                val address:Address=addressList[0]
+                val sb=StringBuilder()
+                for(i in 0..address.maxAddressLineIndex){  //Returns the largest index currently in use to specify an address line.
+                    sb.append(address.getAddressLine(i)+" ")
                 }
-                sb.deleteCharAt(sb.length - 1)
+                sb.deleteCharAt(sb.length-1)   //to remove the last " "
+
                 return sb.toString()
             }
-        } catch(e: Exception) {
+        }
+        catch (e:Exception){
             e.printStackTrace()
         }
         return ""
     }
 
-    override fun onPostExecute(resultString: String?) {
-        if (resultString == null) {
-            addressListener.onError()
-        } else {
-            addressListener.onAddressFound(resultString)
+    suspend fun launchBackgroundProcessForRequest() {
+        val address=getAddress()
+
+        withContext(Main){
+            // Switch to Main thread to update the UI related values
+            // from here on if we get a valid address
+            if (address.isEmpty()) {
+                addressListener.onError()
+            } else {
+                addressListener.onAddressFound(address)  //updating UI
+            }
         }
-        super.onPostExecute(resultString)
     }
 
     fun setAddressListener(myAddressListener: AddressListener) {
         addressListener = myAddressListener
-    }
-
-    fun getAddress() {
-        execute()
     }
 
     interface AddressListener {
