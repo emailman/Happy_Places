@@ -35,6 +35,7 @@ import edu.mailman.happyplaces.R
 import edu.mailman.happyplaces.database.DatabaseHandler
 import edu.mailman.happyplaces.databinding.ActivityAddHappyPlaceBinding
 import edu.mailman.happyplaces.models.HappyPlaceModel
+import edu.mailman.happyplaces.utils.GetAddressFromLatLng
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -135,6 +136,18 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
             Log.i("HappyPlaces", "latitude: $latitude")
             longitude = mLastLocation.longitude
             Log.i("HappyPlaces", "longitude: $longitude")
+            val addressTask = GetAddressFromLatLng(this@AddHappyPlaceActivity,
+                latitude, longitude)
+            addressTask.setAddressListener(object: GetAddressFromLatLng.AddressListener {
+                override fun onAddressFound(address: String?) {
+                    binding?.etLocation?.setText(address)
+                }
+
+                override fun onError() {
+                    Log.e("HappyPlaces", "Get address error")
+                }
+            })
+            addressTask.getAddress()
         }
     }
 
