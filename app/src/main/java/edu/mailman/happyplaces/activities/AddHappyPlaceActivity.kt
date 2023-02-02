@@ -123,10 +123,13 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
 
     @SuppressLint("MissingPermission")
     private fun requestNewLocationData() {
-        val locationRequest = LocationRequest()
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        locationRequest.interval = 1000
-        locationRequest.numUpdates = 1
+        val locationRequest =
+            LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY, 1000)
+                .setWaitForAccurateLocation(false)
+                .setMaxUpdates(1)
+                .build()
+
         fusedLocationClient.requestLocationUpdates(
             locationRequest,
             mLocationCallBack,
@@ -147,7 +150,7 @@ class AddHappyPlaceActivity : AppCompatActivity(), View.OnClickListener {
                 lat = mLatitude,lng = mLongitude)
 
 
-            addressTask.setAddressListener(object : GetAddressFromLatLng.AddressListener {
+            addressTask.setCustomAddressListener(object : GetAddressFromLatLng.AddressListener {
 
                 override fun onAddressFound(address: String?) {
                     binding?.etLocation?.setText(address)

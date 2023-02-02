@@ -50,7 +50,7 @@ class GetAddressFromLatLng(context: Context,
         }
     }
 
-    fun setAddressListener(myAddressListener: AddressListener) {
+    fun setCustomAddressListener(myAddressListener: AddressListener) {
         addressListener = myAddressListener
     }
 
