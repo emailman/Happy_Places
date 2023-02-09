@@ -33,7 +33,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             supportActionBar!!.setDisplayHomeAsUpEnabled(true)
             supportActionBar!!.title = happyPlaceDetails!!.title
 
-            binding?.toolbarMap?.setNavigationOnClickListener() {
+            binding?.toolbarMap?.setNavigationOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
             }
 
@@ -44,11 +44,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
-    }
-
     override fun onMapReady(googleMap: GoogleMap) {
         val position = LatLng(happyPlaceDetails!!.latitude,
             happyPlaceDetails!!.longitude)
@@ -56,5 +51,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         title(happyPlaceDetails!!.location))
         val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(position, 15f)
         googleMap.animateCamera(newLatLngZoom)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
     }
 }
